@@ -163,11 +163,6 @@
   resolved "https://registry.yarnpkg.com/@pixi/colord/-/colord-2.9.6.tgz#7e4e7851480da6fd3cef4e331f008d60be7e1204"
   integrity sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==
 
-"@pixi/math-extras@^7.4.3":
-  version "7.4.3"
-  resolved "https://registry.yarnpkg.com/@pixi/math-extras/-/math-extras-7.4.3.tgz#8346c5bfed18a2f795fad332251c3ca90069a1e5"
-  integrity sha512-VUImB51/V40f5kp2HzSBTmKrj3NagV2khdiaxYkzTsoGLwKj4B1CyvoWLaCdWVKF0UjUJ814cTa5kA9SJzTadA==
-
 "@pixi/spine-pixi@^2.1.1":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/@pixi/spine-pixi/-/spine-pixi-2.1.1.tgz#9aca314462b42da92e778a013403740effa948de"
