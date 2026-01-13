@@ -3,9 +3,9 @@ import { SlotMachine } from './slot-machine';
 import './style.css';
 
 (async () => {
-    // 1. 初始化 Pixi App
+    // 1. 初始化 Pixi App（背景透明，讓 CSS 漸層背景顯示出來）
     const app = new Application();
-    await app.init({ background: '#1099bb', resizeTo: window });
+    await app.init({ backgroundAlpha: 0, resizeTo: window });
     document.body.appendChild(app.canvas);
 
     // 2. 載入多種 slot 圖示資源
@@ -65,53 +65,78 @@ import './style.css';
     app.stage.addChild(reelContainer);
 
     // ---------------------------------------------------------
-    // 4. 畫一個外框 (美觀用，讓它看起來像個視窗)
+    // 4. Glassmorphism 外框 ✨
     // ---------------------------------------------------------
-    const border = new Graphics()
-        .rect(0, 0, totalWidth, totalHeight)
-        .stroke({ width: 5, color: 0xFFD700 }); // 金色框框
-    reelContainer.addChild(border);
-
-
-    // ---------------------------------------------------------
-    // 5. 建立按鈕
-    // ---------------------------------------------------------
-    // SPIN 按鈕
-    const btnBg = new Graphics().roundRect(0, 0, 200, 80, 20).fill({ color: 0xFFFFFF });
-    const btnText = new Text({ 
-        text: 'SPIN!', 
-        style: { fontFamily: 'Arial', fontSize: 36, fill: '#1099bb', fontWeight: 'bold' } 
-    });
-    btnText.anchor.set(0.5);
-    btnText.x = 100; 
-    btnText.y = 40;
-
-    const button = new Container();
-    button.addChild(btnBg);
-    button.addChild(btnText);
-    button.pivot.set(100, 40);
+    const PADDING = 20; // 玻璃框比內容大一點
+    const RADIUS = 24;  // 圓角
     
-    button.eventMode = 'static';
-    button.cursor = 'pointer';
+    // 玻璃背景層（放在最下面）
+    const glassBackground = new Graphics()
+        .roundRect(-PADDING, -PADDING, totalWidth + PADDING * 2, totalHeight + PADDING * 2, RADIUS)
+        .fill({ color: 0xffffff, alpha: 0.25 }); // 半透明白色
+    reelContainer.addChildAt(glassBackground, 0); // 插入到最底層
+    
+    // 玻璃邊框（細細的白色邊）
+    const glassBorder = new Graphics()
+        .roundRect(-PADDING, -PADDING, totalWidth + PADDING * 2, totalHeight + PADDING * 2, RADIUS)
+        .stroke({ width: 2, color: 0xffffff, alpha: 0.6 }); // 半透明白色邊框
+    reelContainer.addChild(glassBorder);
+    
+    // 內部高光（上方的光澤感）
+    const glassHighlight = new Graphics()
+        .roundRect(-PADDING + 4, -PADDING + 4, totalWidth + PADDING * 2 - 8, (totalHeight + PADDING * 2) * 0.3, RADIUS - 2)
+        .fill({ color: 0xffffff, alpha: 0.15 }); // 微微的高光
+    reelContainer.addChild(glassHighlight);
+
+
+    // ---------------------------------------------------------
+    // 5. 建立按鈕（彩色玻璃風格）
+    // ---------------------------------------------------------
+    // 建立彩色玻璃按鈕的輔助函式
+    function createGlassButton(text: string, glassColor: number, textColor: string) {
+        const btn = new Container();
+        
+        // 彩色玻璃背景
+        const bg = new Graphics()
+            .roundRect(0, 0, 200, 80, 20)
+            .fill({ color: glassColor, alpha: 0.35 });
+        btn.addChild(bg);
+        
+        // 白色邊框
+        const border = new Graphics()
+            .roundRect(0, 0, 200, 80, 20)
+            .stroke({ width: 2, color: 0xffffff, alpha: 0.6 });
+        btn.addChild(border);
+        
+        // 上方高光（玻璃光澤）
+        const highlight = new Graphics()
+            .roundRect(4, 4, 192, 28, 16)
+            .fill({ color: 0xffffff, alpha: 0.3 });
+        btn.addChild(highlight);
+        
+        // 文字
+        const label = new Text({ 
+            text, 
+            style: { fontFamily: 'Arial', fontSize: 32, fill: textColor, fontWeight: 'bold' } 
+        });
+        label.anchor.set(0.5);
+        label.x = 100; 
+        label.y = 40;
+        btn.addChild(label);
+        
+        btn.pivot.set(100, 40);
+        btn.eventMode = 'static';
+        btn.cursor = 'pointer';
+        
+        return { container: btn, label };
+    }
+
+    // SPIN 按鈕（藍色玻璃）
+    const { container: button, label: btnText } = createGlassButton('SPIN!', 0x3b82f6, '#ffffff');
     app.stage.addChild(button);
 
-    // 必中按鈕 🎯
-    const jackpotBg = new Graphics().roundRect(0, 0, 200, 80, 20).fill({ color: 0xFFD700 });
-    const jackpotText = new Text({ 
-        text: '🎯 必中！', 
-        style: { fontFamily: 'Arial', fontSize: 32, fill: '#333', fontWeight: 'bold' } 
-    });
-    jackpotText.anchor.set(0.5);
-    jackpotText.x = 100; 
-    jackpotText.y = 40;
-
-    const jackpotButton = new Container();
-    jackpotButton.addChild(jackpotBg);
-    jackpotButton.addChild(jackpotText);
-    jackpotButton.pivot.set(100, 40);
-    
-    jackpotButton.eventMode = 'static';
-    jackpotButton.cursor = 'pointer';
+    // 必中按鈕（金色玻璃）🎯
+    const { container: jackpotButton } = createGlassButton('🎯 必中！', 0xf59e0b, '#ffffff');
     app.stage.addChild(jackpotButton);
 
     // ---------------------------------------------------------
