@@ -1,5 +1,6 @@
 import { Application, Assets, Text, Graphics, Container } from 'pixi.js';
 import { SlotMachine } from './slot-machine';
+import { Character } from './character';
 import './style.css';
 
 (async () => {
@@ -14,11 +15,13 @@ import './style.css';
         { alias: 'sym2', src: 'https://pixijs.com/assets/flowerTop.png' },
         { alias: 'sym3', src: 'https://pixijs.com/assets/helmlok.png' },
         { alias: 'sym4', src: 'https://pixijs.com/assets/skully.png' },
+        { alias: 'character', src: 'https://pixijs.com/assets/bunny.png' }, // 小角色
     ];
     await Assets.load(slotSymbols);
 
     // 把載入的貼圖放進陣列
-    const slotTextures = slotSymbols.map(s => Assets.get(s.alias));
+    const slotTextures = slotSymbols.slice(0, 4).map(s => Assets.get(s.alias));
+    const characterTexture = Assets.get('character');
 
     // ---------------------------------------------------------
     // 3. 建立 3 軸老虎機 (Reels)
@@ -140,7 +143,23 @@ import './style.css';
     app.stage.addChild(jackpotButton);
 
     // ---------------------------------------------------------
-    // 5.5 Resize 處理：視窗縮放時重新定位物件
+    // 6. 建立小角色 🏃
+    // ---------------------------------------------------------
+    const groundY = app.screen.height - 50; // 地面位置
+    const player = new Character(characterTexture, groundY);
+    player.x = 100; // 初始位置在左邊
+    app.stage.addChild(player);
+
+    // 操作提示
+    const controlsHint = new Text({
+        text: '🎮 ← → 移動 | Space 跳躍 | R 空中旋轉',
+        style: { fontFamily: 'Arial', fontSize: 18, fill: '#666666' }
+    });
+    controlsHint.anchor.set(0.5, 1);
+    app.stage.addChild(controlsHint);
+
+    // ---------------------------------------------------------
+    // 7. Resize 處理：視窗縮放時重新定位物件
     // ---------------------------------------------------------
     function onResize() {
         // 老虎機容器置中（用精確計算的尺寸）
@@ -153,6 +172,13 @@ import './style.css';
         
         jackpotButton.x = app.screen.width / 2 + 110; // 右邊
         jackpotButton.y = reelContainer.y + totalHeight + 80;
+        
+        // 操作提示放在底部
+        controlsHint.x = app.screen.width / 2;
+        controlsHint.y = app.screen.height - 10;
+        
+        // 更新角色的地面位置
+        player.setGroundY(app.screen.height - 50);
     }
 
     // 初始化時先執行一次
@@ -207,13 +233,17 @@ import './style.css';
     }
 
     // ---------------------------------------------------------
-    // 7. 遊戲迴圈
+    // 9. 遊戲迴圈
     // ---------------------------------------------------------
     app.ticker.add((ticker) => {
         // 更新每一條滾輪
         reels.forEach(reel => {
             reel.update(ticker.deltaTime);
         });
+
+        // 更新角色
+        player.update(ticker.deltaTime);
+        player.clampPosition(50, app.screen.width - 50); // 限制在畫面內
 
         // 只有在轉動中才需要判斷
         if (!isSpinning) return;
