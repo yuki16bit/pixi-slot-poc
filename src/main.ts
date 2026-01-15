@@ -1,6 +1,8 @@
 import { Application, Assets, Text, Graphics, Container } from 'pixi.js';
+import { Spine } from '@esotericsoftware/spine-pixi-v8';
 import { SlotMachine } from './slot-machine';
 import { Character } from './character';
+import { SpineCheerleader } from './spine-cheerleader';
 import './style.css';
 
 (async () => {
@@ -18,6 +20,12 @@ import './style.css';
         { alias: 'character', src: 'https://pixijs.com/assets/bunny.png' }, // 小角色
     ];
     await Assets.load(slotSymbols);
+
+    // 3. 載入 Spine 資源（啦啦隊角色）
+    await Assets.load([
+        { alias: 'spineboySkeleton', src: './spine/spineboy-pro.skel' },
+        { alias: 'spineboyAtlas', src: './spine/spineboy.atlas' },
+    ]);
 
     // 把載入的貼圖放進陣列
     const slotTextures = slotSymbols.slice(0, 4).map(s => Assets.get(s.alias));
@@ -150,6 +158,28 @@ import './style.css';
     player.x = 100; // 初始位置在左邊
     app.stage.addChild(player);
 
+    // ---------------------------------------------------------
+    // 6.5 建立 Spine 啦啦隊角色 🎭
+    // ---------------------------------------------------------
+    let cheerleader: SpineCheerleader | null = null;
+    
+    try {
+        // 使用新版 API 建立 Spine 實例
+        const spineInstance = Spine.from({
+            skeleton: 'spineboySkeleton',
+            atlas: 'spineboyAtlas',
+        });
+        
+        cheerleader = new SpineCheerleader(spineInstance);
+        cheerleader.setScale(0.25); // 縮小一點
+        cheerleader.setFacingLeft(true); // 面向左邊（看著老虎機）
+        app.stage.addChild(cheerleader.spine);
+        
+        console.log('Spine 啦啦隊角色載入成功！');
+    } catch (error) {
+        console.warn('Spine 載入失敗，跳過啦啦隊角色：', error);
+    }
+
     // 操作提示
     const controlsHint = new Text({
         text: '🎮 ← → 移動 | Space 跳躍 | R 空中旋轉',
@@ -179,6 +209,14 @@ import './style.css';
         
         // 更新角色的地面位置
         player.setGroundY(app.screen.height - 50);
+        
+        // 更新 Spine 啦啦隊角色位置（老虎機右上方）
+        if (cheerleader) {
+            cheerleader.setPosition(
+                reelContainer.x + totalWidth + 80, // 老虎機右邊
+                reelContainer.y + totalHeight      // 腳踩在老虎機底部
+            );
+        }
     }
 
     // 初始化時先執行一次
@@ -223,6 +261,11 @@ import './style.css';
         // 如果是必中模式，隨機選一個圖案讓三軸都停在這個圖案
         const winIndex = forceWin ? Math.floor(Math.random() * slotTextures.length) : -1;
 
+        // 啦啦隊歡呼（開始轉的時候）
+        if (cheerleader) {
+            cheerleader.cheer();
+        }
+
         // 啟動每一條滾輪
         reels.forEach((reel, index) => {
             // 小技巧：讓它們「依序」啟動，不要同時轉，看起來比較像真的
@@ -263,10 +306,18 @@ import './style.css';
                 // 中獎！觸發所有滾輪的 WIN 特效
                 btnText.text = '🎉 WINNER!';
                 reels.forEach(reel => reel.triggerWin());
+                // 啦啦隊慶祝！
+                if (cheerleader) {
+                    cheerleader.celebrate();
+                }
             } else {
                 // 沒中獎，回到閒置狀態
                 btnText.text = 'SPIN!';
                 reels.forEach(reel => reel.setIdle());
+                // 啦啦隊失望
+                if (cheerleader) {
+                    cheerleader.disappointed();
+                }
             }
         }
     });

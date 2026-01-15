@@ -132,10 +132,22 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.27.2.tgz#9e585ab6086bef994c6e8a5b3a0481219ada862b"
   integrity sha512-sRdU18mcKf7F+YgheI/zGf5alZatMUTKj/jNS6l744f9u3WFu4v7twcUI9vu4mknF4Y9aDlblIie0IM+5xxaqQ==
 
+"@esotericsoftware/spine-core@4.2.97":
+  version "4.2.97"
+  resolved "https://registry.yarnpkg.com/@esotericsoftware/spine-core/-/spine-core-4.2.97.tgz#fdd2e19a9b558925979ad6dbf402a19f6c27a0e4"
+  integrity sha512-cJyFo881K4kBrYap1pihfc8YF6+zTy+TktukNJkxtg5tFZtaGFjSWHvsOFaXODmYrvG9EsgR6I7nqzRY5uzJAw==
+
 "@esotericsoftware/spine-core@~4.2.45":
   version "4.2.96"
   resolved "https://registry.yarnpkg.com/@esotericsoftware/spine-core/-/spine-core-4.2.96.tgz#18fcba0cc67ad3f3c6058328463cd7a78a4eb611"
   integrity sha512-/uJjPldI/D1AOqydlcqA6AFXs7L512Mox+UxWNYnzxiOcSMsI7gancktU6ltEwBQpryYvV1/eoRJu6Md023tSg==
+
+"@esotericsoftware/spine-pixi-v8@^4.2.97":
+  version "4.2.97"
+  resolved "https://registry.yarnpkg.com/@esotericsoftware/spine-pixi-v8/-/spine-pixi-v8-4.2.97.tgz#6b25c97c6e794d64b43f1e70f30239c606206e3e"
+  integrity sha512-sfMmhxRlqKrw2A1TqYIdAGfedO82BWoRK9zoJysjxwLxO0UDPSLIRgxztmbOWBpT0IzX2Kcz7bNrDHuCJmMlVg==
+  dependencies:
+    "@esotericsoftware/spine-core" "4.2.97"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
